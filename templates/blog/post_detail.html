@@ -3,22 +3,24 @@
 {% block title %}{{ post.title }} | Simple Blog{% endblock %}
 
 {% block content %}
-<article class="detail-card">
-    <a class="back-link" href="{% url 'post_list' %}">&larr; All posts</a>
-    <p class="post-meta">By {{ post.author.username }} · Published {{ post.created_at|date:"M j, Y, g:i a" }}</p>
-    <h1>{{ post.title }}</h1>
-    {% if post.featured_image %}
-        <img class="detail-image" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
-    {% endif %}
-    <div class="post-content">{{ post.content|linebreaks }}</div>
-    {% if post.updated_at != post.created_at %}
-        <p class="muted">Updated {{ post.updated_at|date:"M j, Y, g:i a" }}</p>
-    {% endif %}
-    {% if user == post.author %}
-        <div class="post-actions">
-            <a class="button button-secondary" href="{% url 'post_edit' post.pk %}">Edit post</a>
-            <a class="button button-danger" href="{% url 'post_delete' post.pk %}">Delete post</a>
-        </div>
-    {% endif %}
-</article>
+    <article class="post-card">
+        <h1>{{ post.title }}</h1>
+        <p class="post-meta">
+            By {{ post.author.username }} on {{ post.created_at|date:"F j, Y" }}
+            {% if post.updated_at != post.created_at %}
+                (updated {{ post.updated_at|date:"F j, Y" }})
+            {% endif %}
+        </p>
+        {% if post.featured_image %}
+            <img class="featured-image" src="{{ post.featured_image.url }}" alt="Image for {{ post.title }}">
+        {% endif %}
+        <div class="post-content">{{ post.content|linebreaks }}</div>
+        {% if user == post.author %}
+            <div class="post-actions">
+                <a class="button secondary" href="{% url 'post_edit' post.pk %}">Edit</a>
+                <a class="button danger" href="{% url 'post_delete' post.pk %}">Delete</a>
+            </div>
+        {% endif %}
+    </article>
+    <a class="back-link" href="{% url 'post_list' %}">&larr; Back to all posts</a>
 {% endblock %}

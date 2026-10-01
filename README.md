@@ -1,33 +1,109 @@
 # Simple Blog
 
-A beginner-friendly blog application built with Django. It uses Django's built-in user authentication, a SQLite database, Django ModelForms, templates, and the Django admin site.
+A small beginner-friendly blog built with Python and Django. It demonstrates
+Django models, views, templates, forms, authentication, URL routing, the ORM,
+CRUD operations, and the Django admin.
 
-## Features
-
-- Register, log in, and log out with Django authentication.
-- Browse and search posts by title; the list is paginated.
-- Open a post to read its full content and optional featured image.
-- Logged-in users can create posts. Each new post is automatically assigned to its author.
-- Authors can edit and delete only their own posts.
-- Django admin can manage users and posts, search post titles/content, and filter by dates.
-- Post titles and content are required and display form validation errors.
+Users can browse posts without an account. After registering or logging in,
+they can write posts with an optional featured image and manage their own
+posts. Visitors can search posts by title or content and browse results a few
+posts at a time. The Django admin can manage users and all posts.
 
 ## Requirements
 
 - Python 3.10 or newer
-- pip
+- Git
+
+## Installation and setup (Windows PowerShell)
+
+Open PowerShell in the project folder and create a virtual environment:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation, use Command Prompt and run:
+
+```cmd
+.venv\Scripts\activate.bat
+```
+
+Install the packages:
+
+```powershell
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+Set a private Django secret key for this PowerShell session. This generates a
+random key using Django; do not share it or commit it:
+
+```powershell
+$env:DJANGO_SECRET_KEY = python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+Set the secret again in each new terminal session before running Django.
+
+## Database migration
+
+Create the local SQLite database tables:
+
+```powershell
+python manage.py migrate
+```
+
+## Create an admin user
+
+Create a username and password when prompted:
+
+```powershell
+python manage.py createsuperuser
+```
+
+## Run the project
+
+Start Django's development server:
+
+```powershell
+python manage.py runserver
+```
+
+Open <http://127.0.0.1:8000/> for the blog, or
+<http://127.0.0.1:8000/admin/> for the admin panel. The development server is
+for local development, not production hosting.
+
+## Main pages
+
+- `/` - list all posts
+- Search by entering a word from the post title or content on the home page
+- `/register/` - create an account
+- `/login/` and `/logout/` - sign in and out
+- `/posts/create/` - write a post
+- `/posts/<id>/` - view a post
+- `/posts/<id>/edit/` and `/posts/<id>/delete/` - manage your own post
+- `/admin/` - Django admin
+
+## Project layout
+
+- `config/` - Django project settings and main URL configuration
+- `blog/` - post model, forms, views, URLs, admin configuration, and tests
+- `blog/migrations/` - database schema migrations
+- `templates/` - shared `base.html` and organized page templates
+- `static/` - stylesheet
 
 ## Git
 
-The project folder is initialized as a local Git repository. To review and save your changes:
+This project is in a local Git repository. To save your changes:
 
 ```powershell
 git status
-git add .
-git commit -m "Create beginner Django blog"
+git add .gitignore README.md requirements.txt blog config static templates manage.py
+git commit -m "Build simple Django blog"
 ```
 
-To publish it online, create an empty repository on your Git hosting service, then add its URL and push:
+To publish it, first create an empty repository on your Git hosting service,
+then connect and push your local repository:
 
 ```powershell
 git remote add origin <repository-url>
@@ -35,63 +111,12 @@ git branch -M main
 git push -u origin main
 ```
 
-## Setup
+Do not add your `.env` file, secret key, database, or uploaded media to Git.
 
-Open a terminal in the project folder and create a virtual environment:
+## Run tests
 
-```powershell
-py -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-```
-
-If PowerShell does not allow activation, run the environment's Python directly:
+With the virtual environment active and `DJANGO_SECRET_KEY` set, run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+python manage.py test
 ```
-
-Set a development secret key for the current PowerShell window:
-
-```powershell
-$env:DJANGO_SECRET_KEY = python -c "import secrets; print(secrets.token_urlsafe(50))"
-```
-
-The secret key is read from the environment and is not stored in the project. Set it again in a new terminal window. For a deployed site, also set `DJANGO_DEBUG=False` and configure `ALLOWED_HOSTS` in `config/settings.py` for your domain.
-
-## Database migrations
-
-Create and apply the database tables:
-
-```powershell
-python manage.py makemigrations
-python manage.py migrate
-```
-
-SQLite database and uploaded images are stored locally in `db.sqlite3` and `media/`. During local development, uploaded images are served by Django from `/media/`. In production, configure your web server or storage service to serve media files; Django's development media route is only enabled when `DEBUG=True`.
-
-## Create an admin user
-
-```powershell
-python manage.py createsuperuser
-```
-
-Follow the prompts to choose an admin username and password. Visit `/admin/` after starting the site to manage users and posts.
-
-## Run the website
-
-```powershell
-python manage.py runserver
-```
-
-Open <http://127.0.0.1:8000/>. The main pages are:
-
-- `/` — blog listing, title search, and pagination
-- `/register/` — create an account
-- `/login/` — log in
-- `/logout/` — log out using the site's POST button
-- `/posts/create/` — create a post
-- `/posts/<id>/` — view a post
-- `/posts/<id>/edit/` — edit your own post
-- `/posts/<id>/delete/` — confirm deletion of your own post
-- `/admin/` — Django admin

@@ -3,23 +3,23 @@
 {% block title %}{{ page_title }} | Simple Blog{% endblock %}
 
 {% block content %}
-<section class="form-card form-card-wide">
     <h1>{{ page_title }}</h1>
-    <p class="muted">A clear title and thoughtful content make a great post. An image is optional.</p>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" class="form-card">
         {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="form-errors" role="alert">{{ form.non_field_errors }}</div>
+        {% endif %}
         {% for field in form %}
-            <div class="form-field">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <p class="form-field">
+                {{ field.label_tag }}
                 {{ field }}
-                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
-            </div>
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </p>
         {% endfor %}
-        {% for error in form.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
         <div class="form-actions">
             <button class="button" type="submit">Save post</button>
-            <a class="button button-secondary" href="{% if post %}{{ post.get_absolute_url }}{% else %}{% url 'post_list' %}{% endif %}">Cancel</a>
+            <a href="{% url 'post_list' %}">Cancel</a>
         </div>
     </form>
-</section>
 {% endblock %}

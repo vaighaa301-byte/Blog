@@ -1,8 +1,8 @@
-from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import PostForm
@@ -13,9 +13,12 @@ def post_list(request):
     posts = Post.objects.select_related("author").all()
     search_query = request.GET.get("q", "").strip()
     if search_query:
-        posts = posts.filter(title__icontains=search_query)
+        posts = posts.filter(
+            Q(title__icontains=search_query)
+            | Q(content__icontains=search_query)
+        )
 
-    page_obj = Paginator(posts, 6).get_page(request.GET.get("page"))
+    page_obj = Paginator(posts, 5).get_page(request.GET.get("page"))
     return render(
         request,
         "blog/post_list.html",
@@ -37,7 +40,6 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Your account has been created.")
             return redirect("post_list")
     else:
         form = UserCreationForm()
@@ -53,7 +55,6 @@ def post_create(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
-            messages.success(request, "Your post has been published.")
             return redirect(post)
     else:
         form = PostForm()
@@ -61,7 +62,7 @@ def post_create(request):
     return render(
         request,
         "blog/post_form.html",
-        {"form": form, "page_title": "Create a post"},
+        {"form": form, "page_title": "Write a post"},
     )
 
 
@@ -72,7 +73,6 @@ def post_edit(request, pk):
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             form.save()
-            messages.success(request, "Your post has been updated.")
             return redirect(post)
     else:
         form = PostForm(instance=post)
@@ -80,7 +80,7 @@ def post_edit(request, pk):
     return render(
         request,
         "blog/post_form.html",
-        {"form": form, "page_title": "Edit post", "post": post},
+        {"form": form, "page_title": "Edit post"},
     )
 
 
@@ -89,7 +89,6 @@ def post_delete(request, pk):
     post = get_object_or_404(Post, pk=pk, author=request.user)
     if request.method == "POST":
         post.delete()
-        messages.success(request, "Your post has been deleted.")
         return redirect("post_list")
 
     return render(request, "blog/post_confirm_delete.html", {"post": post})

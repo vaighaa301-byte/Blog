@@ -9,12 +9,15 @@
 </head>
 <body>
     <header class="site-header">
-        <nav class="nav container" aria-label="Main navigation">
-            <a class="brand" href="{% url 'post_list' %}">Simple Blog</a>
+        <nav class="container nav">
+            <a class="brand" href="{% url 'post_list' %}" aria-label="Simple Blog home">
+                <span class="brand-mark">B</span>
+                Simple Blog
+            </a>
             <div class="nav-links">
                 {% if user.is_authenticated %}
-                    <span class="welcome">Hi, {{ user.get_full_name|default:user.username }}</span>
-                    <a href="{% url 'post_create' %}">Write a post</a>
+                    <span class="welcome">Hello, {{ user.username }}!</span>
+                    <a class="nav-write" href="{% url 'post_create' %}">Write a post</a>
                     <form class="inline-form" method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button class="link-button" type="submit">Log out</button>
@@ -26,20 +29,16 @@
             </div>
         </nav>
     </header>
-
-    <main class="container main-content">
+    <main class="container">
         {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <p class="message {{ message.tags }}">{{ message }}</p>
-                {% endfor %}
-            </div>
+            {% for message in messages %}
+                <p class="message" role="status">{{ message }}</p>
+            {% endfor %}
         {% endif %}
         {% block content %}{% endblock %}
     </main>
-
     <footer class="site-footer">
-        <div class="container">A small place to share your ideas.</div>
+        <div class="container">Simple Blog &mdash; a place to share your ideas.</div>
     </footer>
 </body>
 </html>

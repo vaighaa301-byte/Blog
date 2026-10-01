@@ -9,12 +9,9 @@ class Post(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="blog_posts",
+        related_name="posts",
     )
-    featured_image = models.ImageField(
-        upload_to="post_images/",
-        blank=True,
-    )
+    featured_image = models.ImageField(upload_to="post_images/", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

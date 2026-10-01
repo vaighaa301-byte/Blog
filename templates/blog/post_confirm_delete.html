@@ -3,15 +3,11 @@
 {% block title %}Delete post | Simple Blog{% endblock %}
 
 {% block content %}
-<section class="form-card">
-    <h1>Delete this post?</h1>
-    <p>Are you sure you want to delete <strong>{{ post.title }}</strong>? This cannot be undone.</p>
-    <form method="post">
+    <h1>Delete post</h1>
+    <p>This action cannot be undone. Are you sure you want to delete <strong>{{ post.title }}</strong>?</p>
+    <form method="post" class="form-card">
         {% csrf_token %}
-        <div class="form-actions">
-            <button class="button button-danger" type="submit">Yes, delete post</button>
-            <a class="button button-secondary" href="{{ post.get_absolute_url }}">Keep post</a>
-        </div>
+        <button class="button danger" type="submit">Yes, delete</button>
+        <a href="{% url 'post_detail' post.pk %}">Cancel</a>
     </form>
-</section>
 {% endblock %}

@@ -1,63 +1,92 @@
 {% extends "base.html" %}
 
-{% block title %}Latest posts | Simple Blog{% endblock %}
+{% block title %}Simple Blog{% endblock %}
 
 {% block content %}
-<section class="page-heading">
-    <div>
-        <p class="eyebrow">THE COMMUNITY BLOG</p>
-        <h1>Ideas worth sharing</h1>
-        <p class="muted">Read stories from the community or write one of your own.</p>
-    </div>
-    {% if user.is_authenticated %}
-        <a class="button" href="{% url 'post_create' %}">Write a post</a>
-    {% endif %}
-</section>
-
-<form class="search-form" method="get" action="{% url 'post_list' %}">
-    <label class="visually-hidden" for="post-search">Search by title</label>
-    <input id="post-search" type="search" name="q" value="{{ search_query }}" placeholder="Search posts by title">
-    <button class="button button-secondary" type="submit">Search</button>
-    {% if search_query %}<a href="{% url 'post_list' %}">Clear</a>{% endif %}
-</form>
-
-{% if page_obj.object_list %}
-    <div class="post-grid">
-        {% for post in page_obj %}
-            <article class="post-card">
-                {% if post.featured_image %}
-                    <a href="{{ post.get_absolute_url }}">
-                        <img class="post-image" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
-                    </a>
-                {% endif %}
-                <div class="post-card-body">
-                    <p class="post-meta">By {{ post.author.username }} · {{ post.created_at|date:"M j, Y" }}</p>
-                    <h2><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h2>
-                    <p>{{ post.content|truncatewords:30 }}</p>
-                    <a class="read-more" href="{{ post.get_absolute_url }}">Read post &rarr;</a>
-                </div>
-            </article>
-        {% endfor %}
-    </div>
-
-    {% if page_obj.has_other_pages %}
-        <nav class="pagination" aria-label="Post pages">
-            {% if page_obj.has_previous %}
-                <a href="?q={{ search_query|urlencode }}&amp;page={{ page_obj.previous_page_number }}">← Previous</a>
-            {% endif %}
-            <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-            {% if page_obj.has_next %}
-                <a href="?q={{ search_query|urlencode }}&amp;page={{ page_obj.next_page_number }}">Next →</a>
-            {% endif %}
-        </nav>
-    {% endif %}
-{% else %}
-    <div class="empty-state">
-        <h2>{% if search_query %}No matching posts{% else %}No posts yet{% endif %}</h2>
-        <p>{% if search_query %}Try another title or clear your search.{% else %}Be the first to share an idea.{% endif %}</p>
-        {% if user.is_authenticated and not search_query %}
-            <a class="button" href="{% url 'post_create' %}">Create the first post</a>
+    <section class="welcome-panel">
+        <p class="eyebrow">WELCOME TO SIMPLE BLOG</p>
+        <h1>Ideas worth sharing.</h1>
+        <p>Read stories from the community or sign in to share one of your own.</p>
+        {% if user.is_authenticated %}
+            <a class="button" href="{% url 'post_create' %}">Write your first draft</a>
+        {% else %}
+            <a class="button" href="{% url 'register' %}">Join the community</a>
         {% endif %}
-    </div>
-{% endif %}
+    </section>
+
+    <section aria-labelledby="latest-posts-heading">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">FROM THE COMMUNITY</p>
+                <h2 id="latest-posts-heading">
+                    {% if search_query %}Search results{% else %}Latest posts{% endif %}
+                </h2>
+            </div>
+        </div>
+        <form class="search-form" method="get" action="{% url 'post_list' %}">
+            <label class="visually-hidden" for="post-search">Search posts</label>
+            <input
+                id="post-search"
+                type="search"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="Search posts..."
+            >
+            <button class="button" type="submit">Search</button>
+            {% if search_query %}
+                <a href="{% url 'post_list' %}">Clear</a>
+            {% endif %}
+        </form>
+        <div class="post-list">
+            {% for post in page_obj %}
+                <article class="post-card">
+                    {% if post.featured_image %}
+                        <a class="post-image-link" href="{% url 'post_detail' post.pk %}">
+                            <img class="post-thumbnail" src="{{ post.featured_image.url }}" alt="">
+                        </a>
+                    {% endif %}
+                    <div class="post-card-content">
+                        <p class="post-meta">
+                            {{ post.created_at|date:"F j, Y" }} <span aria-hidden="true">&middot;</span> by {{ post.author.username }}
+                        </p>
+                        <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                        <p class="post-excerpt">{{ post.content|truncatewords:35 }}</p>
+                        <a class="read-more" href="{% url 'post_detail' post.pk %}">Read post <span aria-hidden="true">&rarr;</span></a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    {% if search_query %}
+                        <h3>No matching posts</h3>
+                        <p>Try a different search, or clear your search to see all posts.</p>
+                        <a href="{% url 'post_list' %}">Show all posts</a>
+                    {% else %}
+                        <h3>No posts yet</h3>
+                        <p>Be the first to share something with the community.</p>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'post_create' %}">Create a post</a>
+                        {% else %}
+                            <a href="{% url 'login' %}">Log in</a> or
+                            <a href="{% url 'register' %}">register</a> to get started.
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        {% if page_obj.has_other_pages %}
+            <nav class="pagination" aria-label="Post pages">
+                {% if page_obj.has_previous %}
+                    <a href="?q={{ search_query|urlencode }}&amp;page={{ page_obj.previous_page_number }}">Previous</a>
+                {% else %}
+                    <span class="disabled">Previous</span>
+                {% endif %}
+                <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?q={{ search_query|urlencode }}&amp;page={{ page_obj.next_page_number }}">Next</a>
+                {% else %}
+                    <span class="disabled">Next</span>
+                {% endif %}
+            </nav>
+        {% endif %}
+    </section>
 {% endblock %}
