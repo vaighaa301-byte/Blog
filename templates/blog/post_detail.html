@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }} | Simple Blog{% endblock %}
+
+{% block content %}
+<article class="detail-card">
+    <a class="back-link" href="{% url 'post_list' %}">&larr; All posts</a>
+    <p class="post-meta">By {{ post.author.username }} · Published {{ post.created_at|date:"M j, Y, g:i a" }}</p>
+    <h1>{{ post.title }}</h1>
+    {% if post.featured_image %}
+        <img class="detail-image" src="{{ post.featured_image.url }}" alt="{{ post.title }}">
+    {% endif %}
+    <div class="post-content">{{ post.content|linebreaks }}</div>
+    {% if post.updated_at != post.created_at %}
+        <p class="muted">Updated {{ post.updated_at|date:"M j, Y, g:i a" }}</p>
+    {% endif %}
+    {% if user == post.author %}
+        <div class="post-actions">
+            <a class="button button-secondary" href="{% url 'post_edit' post.pk %}">Edit post</a>
+            <a class="button button-danger" href="{% url 'post_delete' post.pk %}">Delete post</a>
+        </div>
+    {% endif %}
+</article>
+{% endblock %}

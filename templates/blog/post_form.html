@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | Simple Blog{% endblock %}
+
+{% block content %}
+<section class="form-card form-card-wide">
+    <h1>{{ page_title }}</h1>
+    <p class="muted">A clear title and thoughtful content make a great post. An image is optional.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        {% for error in form.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        <div class="form-actions">
+            <button class="button" type="submit">Save post</button>
+            <a class="button button-secondary" href="{% if post %}{{ post.get_absolute_url }}{% else %}{% url 'post_list' %}{% endif %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

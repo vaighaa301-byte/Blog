@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Log in | Simple Blog{% endblock %}
+
+{% block content %}
+<section class="form-card">
+    <h1>Welcome back</h1>
+    <p class="muted">Log in to write and manage your posts.</p>
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="field-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+        {% for field in form %}
+            <div class="form-field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+            </div>
+        {% endfor %}
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+        <button class="button" type="submit">Log in</button>
+    </form>
+    <p class="form-footnote">New here? <a href="{% url 'register' %}">Create an account</a></p>
+</section>
+{% endblock %}
